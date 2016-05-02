@@ -272,7 +272,7 @@ def main(argv=None):  # pylint: disable=unused-argument
   # Create a local session to run the training.
   start_time = time.time()
   start_time_curr = time.time()
-  with tf.Session() as sess:
+  with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
     # Run all the initializers to prepare the trainable parameters.
     tf.initialize_all_variables().run()
     print('Initialized!')
