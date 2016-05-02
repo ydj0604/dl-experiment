@@ -271,6 +271,7 @@ def main(argv=None):  # pylint: disable=unused-argument
 
   # Create a local session to run the training.
   start_time = time.time()
+  start_time_curr = time.time()
   with tf.Session() as sess:
     # Run all the initializers to prepare the trainable parameters.
     tf.initialize_all_variables().run()
@@ -291,17 +292,20 @@ def main(argv=None):  # pylint: disable=unused-argument
           [optimizer, loss, learning_rate, train_prediction],
           feed_dict=feed_dict)
       if step % EVAL_FREQUENCY == 0:
-        elapsed_time = time.time() - start_time
-        start_time = time.time()
+        elapsed_time_curr = time.time() - start_time_curr
         print('Step %d (epoch %.2f), %.1f ms' %
               (step, float(step) * BATCH_SIZE / train_size,
-               1000 * elapsed_time / EVAL_FREQUENCY))
+               1000 * elapsed_time_curr))
         print('Minibatch loss: %.3f, learning rate: %.6f' % (l, lr))
         print('Minibatch error: %.1f%%' % error_rate(predictions, batch_labels))
         print('Validation error: %.1f%%' % error_rate(
             eval_in_batches(validation_data, sess), validation_labels))
         sys.stdout.flush()
+        start_time_curr = time.time()
+
     # Finally print the result!
+    print('Total time (not including graph construction time): %.1f ms'
+          % (1000 * (time.time() - start_time)))
     test_error = error_rate(eval_in_batches(test_data, sess), test_labels)
     print('Test error: %.1f%%' % test_error)
     if FLAGS.self_test:
